@@ -24,6 +24,10 @@ import {
 import { Input } from "@/components/ui/input";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { Spinner } from "@/components/ui/spinner";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { GithubIcon, GoogleIcon } from "@hugeicons/core-free-icons";
+import Link from "next/link";
 
 /* -------------------------------------------------------------------------- */
 /* Schema */
@@ -57,7 +61,7 @@ export function LoginForm(): React.JSX.Element {
     control,
     handleSubmit,
     reset,
-    formState: { isValid },
+    formState: { isValid, isSubmitting },
   } = useForm<LoginFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -99,6 +103,16 @@ export function LoginForm(): React.JSX.Element {
   };
 
   /* -------------------------------------------------------------------------- */
+  /* OAuth */
+  /* -------------------------------------------------------------------------- */
+
+  const handleOAuthSignIn = (provider: "google" | "github") => {
+    // No need for 'redirect: false' usually for OAuth
+    // unless you want to handle the redirect manually
+    signIn(provider, { callbackUrl: "/dashboard" });
+  };
+
+  /* -------------------------------------------------------------------------- */
   /* Autofill handler */
   /* -------------------------------------------------------------------------- */
 
@@ -110,18 +124,49 @@ export function LoginForm(): React.JSX.Element {
   };
 
   return (
-    <Card className="w-full sm:max-w-md border-none">
+    <Card className="w-full sm:max-w-md border-none shadow-lg">
       <CardHeader>
-        <CardTitle className="text-3xl">Login</CardTitle>
+        <CardTitle className="text-3xl font-bold">Login</CardTitle>
         <CardDescription>
-          Enter your credentials to access your account.
+          Choose a provider or use your email to sign in.
         </CardDescription>
       </CardHeader>
 
-      <CardContent>
+      <CardContent className="space-y-4">
+        <div className="grid grid-cols-2 gap-3">
+          <Button
+            variant="outline"
+            type="button"
+            className="w-full transition-all hover:bg-muted"
+            onClick={() => handleOAuthSignIn("google")}
+          >
+            <HugeiconsIcon icon={GoogleIcon} className="mr-2 h-4 w-4" />
+            Google
+          </Button>
+          <Button
+            variant="outline"
+            type="button"
+            className="w-full transition-all hover:bg-muted"
+            onClick={() => handleOAuthSignIn("github")}
+          >
+            <HugeiconsIcon icon={GithubIcon} className="mr-2 h-4 w-4" />
+            GitHub
+          </Button>
+        </div>
+
+        <div className="relative py-2">
+          <div className="absolute inset-0 flex items-center">
+            <span className="w-full border-t" />
+          </div>
+          <div className="relative flex justify-center text-xs uppercase">
+            <span className="bg-background px-2 text-muted-foreground">
+              Or continue with
+            </span>
+          </div>
+        </div>
+
         <form id="login-form" onSubmit={handleSubmit(handleLogin)}>
-          <FieldGroup>
-            {/* Email */}
+          <FieldGroup className="gap-4">
             <Controller
               name="email"
               control={control}
@@ -132,9 +177,7 @@ export function LoginForm(): React.JSX.Element {
                     {...field}
                     id="email"
                     type="email"
-                    autoComplete="email"
                     placeholder="you@example.com"
-                    aria-invalid={fieldState.invalid}
                   />
                   {fieldState.invalid && (
                     <FieldError errors={[fieldState.error]} />
@@ -143,7 +186,6 @@ export function LoginForm(): React.JSX.Element {
               )}
             />
 
-            {/* Password */}
             <Controller
               name="password"
               control={control}
@@ -154,9 +196,7 @@ export function LoginForm(): React.JSX.Element {
                     {...field}
                     id="password"
                     type="password"
-                    autoComplete="current-password"
                     placeholder="••••••••"
-                    aria-invalid={fieldState.invalid}
                   />
                   {fieldState.invalid && (
                     <FieldError errors={[fieldState.error]} />
@@ -168,20 +208,36 @@ export function LoginForm(): React.JSX.Element {
         </form>
       </CardContent>
 
-      <CardFooter className="flex flex-col gap-2">
-        {/* Demo button */}
+      <CardFooter className="flex flex-col gap-3">
         <Button
-          type="button"
-          variant="destructive"
-          onClick={handleDemoFill}
-          className="w-full text-sm cursor-pointer"
+          type="submit"
+          form="login-form"
+          className="w-full text-sm font-semibold"
+          disabled={!isValid || isSubmitting}
         >
-          Use Demo Account
+          {isSubmitting ? <Spinner data-icon="inline-start" /> : null}
+          Sign In with Email
         </Button>
 
-        <Button type="submit" form="login-form" className="w-full text-sm cursor-pointer" disabled={!isValid}>
-          Login
-        </Button>
+        <div className="flex flex-col items-center gap-2 w-full mt-2">
+          <button
+            type="button"
+            onClick={handleDemoFill}
+            className="text-xs text-destructive hover:underline font-medium"
+          >
+            Forgot password? Try our Demo Account
+          </button>
+
+          <p className="text-sm text-muted-foreground">
+            Don’t have an account?{" "}
+            <Link
+              href="/signup"
+              className="text-primary font-bold hover:underline"
+            >
+              Create one
+            </Link>
+          </p>
+        </div>
       </CardFooter>
     </Card>
   );

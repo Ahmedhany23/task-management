@@ -26,6 +26,7 @@ import { Input } from "@/components/ui/input";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { Spinner } from "@/components/ui/spinner";
+import Link from "next/link";
 
 /* -------------------------------------------------------------------------- */
 /* Schema */
@@ -105,29 +106,32 @@ export function SignupForm(): React.JSX.Element {
   /* -------------------------------------------------------------------------- */
 
   return (
-    <Card className="w-full sm:max-w-md border-none">
-      <CardHeader>
-        <CardTitle className="text-3xl">Sign up</CardTitle>
-        <CardDescription>Create your account to continue.</CardDescription>
+    <Card className="w-full sm:max-w-md border-none shadow-xl">
+      <CardHeader className="space-y-1">
+        <CardTitle className="text-3xl font-bold tracking-tight">
+          Sign up
+        </CardTitle>
+        <CardDescription>
+          Create your account to start managing your tasks.
+        </CardDescription>
       </CardHeader>
 
       <CardContent>
         <form id="signup-form" onSubmit={handleSubmit(handleSignup)}>
-          <FieldGroup>
+          <FieldGroup className="space-y-1">
             {/* Name */}
             <Controller
               name="name"
               control={control}
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="name">Name</FieldLabel>
+                  <FieldLabel htmlFor="name">Full Name</FieldLabel>
                   <Input
                     {...field}
                     id="name"
-                    type="text"
                     autoComplete="name"
-                    aria-invalid={fieldState.invalid}
                     placeholder="John Doe"
+                    className="h-11"
                   />
                   {fieldState.error && (
                     <FieldError errors={[fieldState.error]} />
@@ -142,14 +146,14 @@ export function SignupForm(): React.JSX.Element {
               control={control}
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="email">Email</FieldLabel>
+                  <FieldLabel htmlFor="email">Email Address</FieldLabel>
                   <Input
                     {...field}
                     id="email"
                     type="email"
                     autoComplete="email"
-                    aria-invalid={fieldState.invalid}
-                    placeholder="your@example.com"
+                    placeholder="name@example.com"
+                    className="h-11"
                   />
                   {fieldState.error && (
                     <FieldError errors={[fieldState.error]} />
@@ -158,65 +162,79 @@ export function SignupForm(): React.JSX.Element {
               )}
             />
 
-            {/* Password */}
-            <Controller
-              name="password"
-              control={control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="password">Password</FieldLabel>
-                  <Input
-                    {...field}
-                    id="password"
-                    type="password"
-                    autoComplete="new-password"
-                    placeholder="••••••••"
-                    aria-invalid={fieldState.invalid}
-                  />
-                  {fieldState.error && (
-                    <FieldError errors={[fieldState.error]} />
-                  )}
-                </Field>
-              )}
-            />
+            {/* Password Grid - Helpful for desktop spacing */}
+            <div className="grid grid-cols-1 gap-4">
+              <Controller
+                name="password"
+                control={control}
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid}>
+                    <FieldLabel htmlFor="password">Password</FieldLabel>
+                    <Input
+                      {...field}
+                      id="password"
+                      type="password"
+                      autoComplete="new-password"
+                      placeholder="••••••••"
+                      className="h-11"
+                    />
+                    {fieldState.error && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
+                  </Field>
+                )}
+              />
 
-            {/* Confirm Password */}
-            <Controller
-              name="confirmPassword"
-              control={control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="confirmPassword">
-                    Confirm Password
-                  </FieldLabel>
-                  <Input
-                    {...field}
-                    id="confirmPassword"
-                    type="password"
-                    placeholder="••••••••"
-                    autoComplete="new-password"
-                    aria-invalid={fieldState.invalid}
-                  />
-                  {fieldState.error && (
-                    <FieldError errors={[fieldState.error]} />
-                  )}
-                </Field>
-              )}
-            />
+              <Controller
+                name="confirmPassword"
+                control={control}
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid}>
+                    <FieldLabel htmlFor="confirmPassword">
+                      Confirm Password
+                    </FieldLabel>
+                    <Input
+                      {...field}
+                      id="confirmPassword"
+                      type="password"
+                      placeholder="••••••••"
+                      autoComplete="new-password"
+                      className="h-11"
+                    />
+                    {fieldState.error && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
+                  </Field>
+                )}
+              />
+            </div>
           </FieldGroup>
         </form>
       </CardContent>
 
-      <CardFooter>
+      <CardFooter className="flex flex-col gap-4 mt-2">
         <Button
           type="submit"
           form="signup-form"
-          className="w-full text-sm"
+          className="w-full h-11 text-base font-semibold transition-all active:scale-[0.98]"
           disabled={!isValid || isSubmitting}
         >
-          {isSubmitting && <Spinner data-icon="inline-start" />}
-          Sign up
+          {isSubmitting ? (
+            <Spinner data-icon="inline-start" />
+          ) : (
+            "Create Account"
+          )}
         </Button>
+
+        <p className="text-sm text-muted-foreground text-center">
+          Already have an account?{" "}
+          <Link
+            href="/login"
+            className="font-bold text-primary underline-offset-4 hover:underline"
+          >
+            Login here
+          </Link>
+        </p>
       </CardFooter>
     </Card>
   );
