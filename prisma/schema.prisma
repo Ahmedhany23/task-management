@@ -1,0 +1,88 @@
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+
+model User {
+  id            String          @id @default(auto()) @map("_id") @db.ObjectId
+  name          String?
+  email         String?         @unique
+  image         String?
+
+  passwordHash String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  createdTasks  Task[]         @relation("TaskCreator")
+  assignedTasks Task[]         @relation("TaskAssignee")
+  notifications Notification[]
+}
+
+model Task {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  title     String
+  note      String?
+  status    TaskStatus @default(TODO)
+  order     Int      @default(0)
+
+  createdById  String   @db.ObjectId
+  createdBy    User     @relation("TaskCreator", fields: [createdById], references: [id], onDelete: Cascade)
+  
+  assignedToId String?  @db.ObjectId
+  assignedTo   User?    @relation("TaskAssignee", fields: [assignedToId], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([createdById])
+  @@index([assignedToId])
+  @@index([status])
+  @@index([order])
+}
+
+model Notification {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  title     String
+  message   String
+  type      NotificationType @default(INFO)
+  isRead    Boolean  @default(false)
+  
+  userId    String   @db.ObjectId
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Optional: link to related task
+  taskId    String?  @db.ObjectId
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([isRead])
+  @@index([createdAt])
+}
+
+enum TaskStatus {
+  TODO
+  IN_PROGRESS
+  REVIEW
+  DONE
+}
+
+enum NotificationType {
+  INFO
+  SUCCESS
+  WARNING
+  ERROR
+  TASK_ASSIGNED
+  TASK_UPDATED
+  TASK_COMPLETED
+}
