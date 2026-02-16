@@ -8,7 +8,7 @@ import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import Credentials from "next-auth/providers/credentials";
 
-console.log("Check Prisma instance:", !!prisma);
+
 
 const handler = NextAuth({
   session: {
