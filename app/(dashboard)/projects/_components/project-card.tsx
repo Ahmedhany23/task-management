@@ -21,6 +21,7 @@ import { CheckCircle, More01Icon, Users } from "@hugeicons/core-free-icons";
 import { IProject } from "../_types/projectType";
 import { useDeleteProject } from "../_hooks/useDeleteProject";
 import { Spinner } from "@/components/ui/spinner";
+import Link from "next/link";
 
 export const ProjectCard = ({
   project,
@@ -37,9 +38,20 @@ export const ProjectCard = ({
       <CardHeader>
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-3 flex-1 min-w-0">
-            <div className="text-4xl rounded-lg shrink-0">{project?.emoji}</div>
+            <Link href={`/projects/${project.id}/tasks`}>
+              {" "}
+              <div className="text-4xl rounded-lg shrink-0">
+                {project?.emoji}
+              </div>
+            </Link>
+
             <div className="min-w-0 flex-1">
-              <CardTitle className="truncate">{project.name}</CardTitle>
+              <CardTitle className="truncate">
+                <Link href={`/projects/${project.id}/tasks`}>
+                  {" "}
+                  {project.name}{" "}
+                </Link>
+              </CardTitle>
               {getStatusBadge(project.status)}
             </div>
           </div>
