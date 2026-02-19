@@ -38,8 +38,7 @@ export const ProjectCard = ({
       <CardHeader>
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-3 flex-1 min-w-0">
-            <Link href={`/projects/${project.id}/tasks`}>
-              {" "}
+            <Link href={`/dashboard/projects/${project.id}/tasks`}>
               <div className="text-4xl rounded-lg shrink-0">
                 {project?.emoji}
               </div>
@@ -47,7 +46,7 @@ export const ProjectCard = ({
 
             <div className="min-w-0 flex-1">
               <CardTitle className="truncate">
-                <Link href={`/projects/${project.id}/tasks`}>
+                <Link href={`/dashboard/projects/${project.id}/tasks`}>
                   {" "}
                   {project.name}{" "}
                 </Link>

@@ -1,9 +1,7 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
+import { IProject } from "../_types/projectType";
 
-interface Project {
-  id: string;
-  name: string;
-}
+
 
 interface Pagination {
   total: number;
@@ -15,7 +13,7 @@ interface Pagination {
 }
 
 interface ProjectsResponse {
-  data: Project[];
+  data: IProject[];
   pagination: Pagination;
 }
 

@@ -22,7 +22,7 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import { Session } from "next-auth";
 import { signOut } from "next-auth/react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -36,16 +36,27 @@ import { ModeToggle } from "./mode-toggle";
 
 export function AppSidebar({ user }: { user: Session["user"] | undefined }) {
   const pathname = usePathname();
+  const router = useRouter();
+
+  if (!user) return null;
 
   const navItems = [
     { name: "Dashboard", href: "/dashboard", icon: DashboardSquare01Icon },
-    { name: "My Projects", href: "/projects", icon: Folder01Icon },
+    { name: "My Projects", href: "/dashboard/projects", icon: Folder01Icon },
   ];
 
+  const isActive = (href: string, currentPath: string): boolean => {
+    if (href === "/dashboard") {
+      return currentPath === "/dashboard";
+    }
+
+    return currentPath === href || currentPath.startsWith(`${href}/`);
+  };
+
   return (
-    <Sidebar variant="sidebar" collapsible="icon">
+    <Sidebar variant="sidebar" collapsible="icon" >
       {/* --- Logo Section --- */}
-      
+
       <SidebarHeader className="py-4">
         <SidebarMenu>
           <SidebarMenuItem>
@@ -68,10 +79,10 @@ export function AppSidebar({ user }: { user: Session["user"] | undefined }) {
           <SidebarGroupLabel>Application</SidebarGroupLabel>
           <SidebarMenu>
             {navItems.map((item) => {
-              const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
+  
               return (
                 <SidebarMenuItem key={item.name}>
-                  <SidebarMenuButton asChild isActive={active} >
+                  <SidebarMenuButton asChild isActive={isActive(item.href, pathname)}>
                     <Link href={item.href}>
                       <HugeiconsIcon icon={item.icon} size={18} />
                       <span>{item.name}</span>
@@ -107,7 +118,10 @@ export function AppSidebar({ user }: { user: Session["user"] | undefined }) {
                   className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
                 >
                   <Avatar className="h-8 w-8 rounded-lg">
-                    <AvatarImage src={user?.image || ""} alt={user?.name || ""} />
+                    <AvatarImage
+                      src={user?.image || ""}
+                      alt={user?.name || ""}
+                    />
                     <AvatarFallback className="rounded-lg">
                       {user?.name?.charAt(0) || "U"}
                     </AvatarFallback>
@@ -116,7 +130,11 @@ export function AppSidebar({ user }: { user: Session["user"] | undefined }) {
                     <span className="truncate font-semibold">{user?.name}</span>
                     <span className="truncate text-xs">{user?.email}</span>
                   </div>
-                  <HugeiconsIcon icon={UserIcon} size={14} className="ml-auto opacity-50" />
+                  <HugeiconsIcon
+                    icon={UserIcon}
+                    size={14}
+                    className="ml-auto opacity-50"
+                  />
                 </SidebarMenuButton>
               </DropdownMenuTrigger>
               <DropdownMenuContent
@@ -134,17 +152,27 @@ export function AppSidebar({ user }: { user: Session["user"] | undefined }) {
                       </AvatarFallback>
                     </Avatar>
                     <div className="grid flex-1 text-left text-sm leading-tight">
-                      <span className="truncate font-semibold">{user?.name}</span>
-                      <span className="truncate text-xs text-muted-foreground">{user?.email}</span>
+                      <span className="truncate font-semibold">
+                        {user?.name}
+                      </span>
+                      <span className="truncate text-xs text-muted-foreground">
+                        {user?.email}
+                      </span>
                     </div>
-                    <ModeToggle/>
+                    <ModeToggle />
                   </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem>Profile</DropdownMenuItem>
                 <DropdownMenuItem>Settings</DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => signOut()} className="text-destructive">
+                <DropdownMenuItem
+                  onClick={() => {
+                    signOut();
+                    router.refresh();
+                  }}
+                  className="text-destructive"
+                >
                   Log out
                 </DropdownMenuItem>
               </DropdownMenuContent>

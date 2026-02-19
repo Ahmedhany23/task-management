@@ -2,21 +2,18 @@
 
 import { useState } from "react";
 
-
 import { Card } from "@/components/ui/card";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Folder, Plus } from "@hugeicons/core-free-icons";
 import { Button } from "@/components/ui/button";
+import { useGetTasks } from "../_hooks/useGetTasks";
+import { TaskTable } from "./task-table";
 
 export function TaskComponent() {
-/*   const { data, isLoading, error } = useGetProjects(); */
+
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
 
 
-/*   if (error) return <div>{error.message}</div>;
-
-  if (isLoading) return <div>Loading...</div>;
- */
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -29,7 +26,8 @@ export function TaskComponent() {
         </div>
       </div>
 
-
+      {/* Task Table */}
+      <TaskTable />
     </div>
   );
 }
